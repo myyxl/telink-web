@@ -3,6 +3,7 @@ import {ServiceStatus} from "../model/ServiceStatus";
 import {useLoaderData} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getStatus} from "../api/ServicesSerivce";
+import {TelemetryTable} from "../components/TelemetryTable";
 
 export const Dashboard = () => {
     const { status } = useLoaderData() as { status: ServiceStatus }
@@ -37,7 +38,7 @@ export const Dashboard = () => {
                     <StatusBox serviceName={"Backend"} online={stateStatus.core}/>
                     <StatusBox serviceName={"Controller"} online={stateStatus.controller}/>
                 </div>
-
+                <TelemetryTable />
             </div>
         </div>
     )

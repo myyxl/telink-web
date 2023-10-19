@@ -12,19 +12,7 @@ const root = ReactDOM.createRoot(
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Dashboard />,
-        loader: async () => {
-            const status = await getStatus();
-            if(!status) {
-                return {
-                    status: {
-                        core: false,
-                        controller: false
-                    }
-                }
-            }
-            return { status: status.data }
-        }
+        element: <Dashboard />
     }
 ])
 

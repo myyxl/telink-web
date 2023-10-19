@@ -1,6 +1,4 @@
-import axios from "axios";
 import {ServiceStatus} from "../model/ServiceStatus";
+import {http} from "./http";
 
-export const getStatus = () => {
-    return axios.get<ServiceStatus>("http://localhost:8000/service/status").catch(() => undefined)
-}
+export const getStatus = () => http.get<ServiceStatus>("/service/status").catch(() => undefined)

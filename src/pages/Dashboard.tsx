@@ -1,33 +1,32 @@
 import {StatusBox} from "../components/StatusBox";
-import {ServiceStatus} from "../model/ServiceStatus";
-import {useLoaderData} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {getStatus} from "../api/ServicesSerivce";
 import {TelemetryTable} from "../components/TelemetryTable";
+import {useStatusStore} from "../store/StatusStore";
+import {useTelemetryStore} from "../store/TelemetryStore";
 
 export const Dashboard = () => {
-    const { status } = useLoaderData() as { status: ServiceStatus }
-    const [stateStatus, setStateStatus] = useState<ServiceStatus>(status)
+    const statusStore: any = useStatusStore()
+    const telemetryStore: any = useTelemetryStore();
 
     useEffect(() => {
         const id = setInterval(() => {
             getStatus().then((response) => {
                 if(response) {
-                    setStateStatus(response.data)
+                    statusStore.setStatus(response.data.core, response.data.controller)
+                    if(!response.data.controller) telemetryStore.clearTelemetry();
                 } else {
-                    setStateStatus({
-                        core: false,
-                        controller: false,
-                    })
+                    statusStore.setAllOffline()
+                    telemetryStore.clearTelemetry();
                 }
 
-            }).catch(() => setStateStatus({
-                core: false,
-                controller: false,
-            }))
+            }).catch(() => {
+                statusStore.setAllOffline()
+                telemetryStore.clearTelemetry();
+            })
         }, 4000)
         return () => clearInterval(id);
-    }, [stateStatus, setStateStatus]);
+    }, [statusStore, telemetryStore]);
 
     return (
         <div className="w-full h-screen flex">
@@ -35,8 +34,8 @@ export const Dashboard = () => {
                 <div className="text-center text-5xl m-7">telink</div>
                 <div className="flex justify-evenly">
                     <StatusBox serviceName={"Frontend"} online={true}/>
-                    <StatusBox serviceName={"Backend"} online={stateStatus.core}/>
-                    <StatusBox serviceName={"Controller"} online={stateStatus.controller}/>
+                    <StatusBox serviceName={"Backend"} online={statusStore.core}/>
+                    <StatusBox serviceName={"Controller"} online={statusStore.controller}/>
                 </div>
                 <TelemetryTable />
             </div>

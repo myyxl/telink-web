@@ -1,22 +1,28 @@
-import {useTelemetryStore} from "../store/TelemetryStore";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {Telemetry} from "../model/Telemetry";
 import {baseUrl} from "../api/http";
 import {useStatusStore} from "../store/StatusStore";
 
 export const TelemetryTable = () => {
 
-    const telemetryStore: any = useTelemetryStore();
+    const [telemetry, setTelemetry] = useState<Telemetry>({
+       velocity: 0,
+       temperature: 0,
+       acceleration: 0,
+       altitude: 0
+    });
+
+    //const telemetryStore: any = useTelemetryStore();
     const enableController = useStatusStore((state: any) => state.enableController)
 
     useEffect(() => {
         const eventSource = new EventSource(`${baseUrl}/telemetry`);
         eventSource.onmessage = (item: MessageEvent<string>) => {
-            telemetryStore.setTelemetry(JSON.parse(item.data) as Telemetry)
+            setTelemetry(JSON.parse(item.data) as Telemetry)
             enableController()
         }
         return () => eventSource.close();
-    }, [telemetryStore, enableController]);
+    }, [telemetry, enableController, setTelemetry]);
 
     return (
         <div className="flex justify-center mt-16">
@@ -30,19 +36,19 @@ export const TelemetryTable = () => {
                 <tbody className="text-center">
                     <tr>
                         <td>Altitude</td>
-                        <td>{telemetryStore.altitude} m</td>
+                        <td>{telemetry.altitude} m</td>
                     </tr>
                     <tr>
                         <td>Velocity</td>
-                        <td>{telemetryStore.velocity} m/s</td>
+                        <td>{telemetry.velocity} m/s</td>
                     </tr>
                     <tr>
                         <td>Acceleration</td>
-                        <td>{telemetryStore.acceleration} m/s²</td>
+                        <td>{telemetry.acceleration} m/s²</td>
                     </tr>
                     <tr>
                         <td>Temperature</td>
-                        <td>{telemetryStore.temperature} °C</td>
+                        <td>{telemetry.temperature} °C</td>
                     </tr>
                 </tbody>
             </table>

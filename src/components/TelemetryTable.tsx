@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {Telemetry} from "../model/Telemetry";
 import {baseUrl} from "../api/http";
-import {useStatusStore} from "../store/StatusStore";
 
 export const TelemetryTable = () => {
 
@@ -12,17 +11,11 @@ export const TelemetryTable = () => {
        altitude: 0
     });
 
-    //const telemetryStore: any = useTelemetryStore();
-    const enableController = useStatusStore((state: any) => state.enableController)
-
     useEffect(() => {
         const eventSource = new EventSource(`${baseUrl}/telemetry`);
-        eventSource.onmessage = (item: MessageEvent<string>) => {
-            setTelemetry(JSON.parse(item.data) as Telemetry)
-            enableController()
-        }
+        eventSource.onmessage = (item: MessageEvent<string>) => setTelemetry(JSON.parse(item.data) as Telemetry)
         return () => eventSource.close();
-    }, [telemetry, enableController, setTelemetry]);
+    }, [telemetry, setTelemetry]);
 
     return (
         <div className="flex justify-center mt-16">
